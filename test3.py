@@ -1,28 +1,28 @@
-from nltk import NaiveBayesClassifier as nbc
-from pythainlp.tokenize import word_tokenize
-import codecs
-from itertools import chain
-# pos.txt
-with codecs.open('pos.txt', 'r', "utf-8") as f:
-    lines = f.readlines()
-listpos=[e.strip() for e in lines]
-del lines
-f.close() # ปิดไฟล์
-# neg.txt
-with codecs.open('neg.txt', 'r', "utf-8") as f:
-    lines = f.readlines()
-listneg=[e.strip() for e in lines]
-f.close() # ปิดไฟล์
+'''import csv
+import pandas as pd
+from datetime import datetime
 
-pos1=['pos']*len(listpos)
-neg1=['neg']*len(listneg)
-training_data = list(zip(listpos,pos1)) + list(zip(listneg,neg1))
-vocabulary = set(chain(*[word_tokenize(i[0].lower()) for i in training_data]))
-feature_set = [({i:(i in word_tokenize(sentence.lower())) for i in vocabulary},tag) for sentence, tag in training_data]
-classifier = nbc.train(feature_set)
+def abc(time):
+    a = time.split(" ")
+    time1 = a[1]
+    time2 = a[2]
+    time2 = datetime.strftime("%m", time2)
+    time3 = a[3]
+    post = str(time3) + '-' + str(time2) + '-'+ str(time1)
+    return post
 
-while True:
-	test_sentence = input('\nข้อความ : ')
-	featurized_test_sentence =  {i:(i in word_tokenize(test_sentence.lower())) for i in vocabulary}
-	print("test_sent:",test_sentence)
-	print("tag:",classifier.classify(featurized_test_sentence)) # ใช้โมเดลที่ train ประมวลผล
+pan = pd.read_csv('google.csv')
+time = pan["Posted"].apply(abc)
+
+pan["Posted"] = time
+
+print(pan["Posted"])'''
+
+
+from datetime import datetime
+
+date_time_str = '2021-Feb-22'
+date_time_obj = datetime.strptime(date_time_str, '%Y-%b-%d')
+
+print(date_time_obj)
+

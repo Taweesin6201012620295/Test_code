@@ -19,10 +19,6 @@ class model():
         pass
 
     def main_mo(self):
-        pos = 0
-        neg = 0
-        neu = 0
-
         # pos.txt
         with codecs.open('pos.txt', 'r', "utf-8") as f:
             lines1 = f.readlines()
@@ -55,20 +51,6 @@ class model():
         #print(classifier)
         totel = (classifier,vocabulary)
         return totel
-    
-    #analysis th word
-    def analyze_word_th(self, data):
-        words = thai_stopwords()
-        V = []
-        data = re.sub("[0-9]",'',data)
-        data = re.sub("[a-z A-Z]",'',data)
-        nlp = word_tokenize(data , engine='newmm',keep_whitespace=False)
-        nlp1 = [data for data in nlp if data not in words]
-        for i in nlp1:
-            r = re.sub('\w','',i)
-            if i not in r and data:
-                V.append(i)
-        return V
 
     def storeData(self): 
         # database 
@@ -104,13 +86,13 @@ tr_mo = model()
 #tr_mo.storeData()
 A = tr_mo.loadData()
 
+data = str(input())
+start = datetime.now()
+
 pos = 0
 neg = 0
 neu = 0
-
-start = datetime.now()
-data = str(input())
-df = pd.read_csv(str(data)+'_crawler.csv')
+df = pd.read_csv(str(data)+'_crawler.csv',error_bad_lines=False)
 
 for tweet in df['Description']:
     test_sentence = tweet
@@ -121,8 +103,10 @@ for tweet in df['Description']:
         neg = neg+1
     else:
         neu = neu+1
+
 end = datetime.now()
 diff = end - start
+
 print(diff)
 print("Total Positive = ", pos)
 print("Total Negative = ", neg)

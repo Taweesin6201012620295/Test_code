@@ -1,4 +1,5 @@
 # python_candlestick_chart.py
+import sys
 from pandas_datareader import data as pdr
 import matplotlib.pyplot as plt
 from mpl_finance import candlestick_ohlc
@@ -6,9 +7,9 @@ import pandas as pd
 import matplotlib.dates as mpl_dates
 
 def stock():
-    stock = "btc-usd"
-    start = "2021-02-16"
-    end = "2021-03-16"
+    stock = "ptt.bk"
+    start = "2021-01-12"
+    end = "2021-03-12"
 
     try:
         df = pdr.get_data_yahoo(stock, start=start, end=end)
