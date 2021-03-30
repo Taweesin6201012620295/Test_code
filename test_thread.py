@@ -21,7 +21,7 @@ class Example(QMainWindow):
 
         self.pbar = QProgressBar(self)
         self.pbar.setGeometry(30, 40, 200, 25)
-        self.pbar.setValue(99)
+        self.pbar.setValue(50)
         
         self.setWindowTitle("QT Progressbar Example")
         self.setGeometry(32,32,280,100)

@@ -54,16 +54,16 @@ if __name__ == "__main__":
                         "https://thestandard.co/wealth/",
                         "https://www.posttoday.com/"]'''
 
-#web = 'https://www.thairath.co.th/search/{}' # css-nsf6k6 e2foe9c8
-#web = 'https://www.mcot.net/search?title={}' # category-container clearfix
-#web = 'https://news.thaipbs.or.th/search?q={}tab=news&time=last_month' #news-content-list
-#web = 'https://www.thaipost.net/main/search?keyword={}'#col-md-8 col-xs-12
-#web = 'https://www.sanook.com/news/search/{}/' #jsx-4244751374
-#web = 'https://search.posttoday.com/search/result?category=all&q={}' #('ul','SearchList')
-#web = 'https://thestandard.co/?s={}&search=' # newsbox-archive
-#web = "http://news.google.com/news?q={}-19&hl=en-US&sort=date&gl=US&num=100&output=rss"
-#web = 'https://www.bing.com/search?q={}&form=PRTHTH&httpsmsn=1&msnews=1&refig=7388bfda75a649f99f4a1f01e812e3d8'
-#web = 'https://news.search.yahoo.com/search?p={}'
+web = 'https://www.thairath.co.th/search/{}' # css-nsf6k6 e2foe9c8
+web = 'https://www.mcot.net/search?title={}' # category-container clearfix
+web = 'https://news.thaipbs.or.th/search?q={}tab=news&time=last_month' #news-content-list
+web = 'https://www.thaipost.net/main/search?keyword={}'#col-md-8 col-xs-12
+web = 'https://www.sanook.com/news/search/{}/' #jsx-4244751374
+web = 'https://search.posttoday.com/search/result?category=all&q={}' #('ul','SearchList')
+web = 'https://thestandard.co/?s={}&search=' # newsbox-archive
+web = "http://news.google.com/news?q={}-19&hl=en-US&sort=date&gl=US&num=100&output=rss"
+web = 'https://www.bing.com/search?q={}&form=PRTHTH&httpsmsn=1&msnews=1&refig=7388bfda75a649f99f4a1f01e812e3d8'
+web = 'https://news.search.yahoo.com/search?p={}'
 web = 'https://www.khaosod.co.th/search?s={}'
 
 url = web.format("โควิด")
