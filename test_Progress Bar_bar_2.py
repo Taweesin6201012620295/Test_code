@@ -3,10 +3,10 @@ import time
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QPushButton, QProgressBar, QVBoxLayout, QApplication
 
-class Thread(QThread):
+class Progress(QThread):
     _signal = pyqtSignal(int)
     def __init__(self):
-        super(Thread, self).__init__()
+        super(Progress, self).__init__()
 
     def __del__(self):
         self.wait()
@@ -32,7 +32,7 @@ class Example(QWidget):
         self.show()
 
     def btnFunc(self):
-        self.thread = Thread()
+        self.thread = Progress()
         self.thread._signal.connect(self.signal_accept)
         self.thread.start()
         self.btn.setEnabled(False)

@@ -18,7 +18,7 @@ class TestNumber(unittest.TestCase):
         self.assertIsNotNone(pan1)
 
     def test_hello_world(self):
-        myCal = Calculator();
+        myCal = Calculator()
         self.assertIsNotNone(myCal.add_num())
  
 if __name__ == '__main__':
