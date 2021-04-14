@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QProgressBar
 )
+
 class Example(QMainWindow):
     
     def __init__(self,n):

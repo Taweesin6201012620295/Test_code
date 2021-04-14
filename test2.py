@@ -305,3 +305,87 @@ def analyze_word_en1(self, data=""):
             if( self.twitter_check ):
                 self.output.append(word.text)
         return self.output
+
+######################################################################################3
+
+#Show Sentiment
+    def show_sentiment(self,data):
+        df = pd.read_csv(str(data)+'_crawler_sentiment.csv')
+        pos = 0
+        neg = 0
+        neu = 0
+        for i,j,k in zip(df['pos'],df['neg'],df['neu']):
+            pos = i
+            neg = j
+            neu = k
+        tol = pos + neg + neu
+        se = QPieSeries()
+
+        se.append('Positive',int(pos))
+        se.append('Negative',int(neg))
+        se.append('Neutral',int(neu))
+        print("Total Positive = ", pos)
+        print("Total Negative = ", neg)
+        print("Total Neutral = ", neu)
+
+        self.bro6.clear()
+        self.bro6.append(f"Total Positive = {pos}")
+        self.bro6.append(f"Total Negative = {neg}")
+        self.bro6.append(f"Total Neutral = {neu}")
+        self.bro6.append(f"Total All = {tol}")
+ 
+        chart = QChart()
+        chart.addSeries(se)
+        chart.setTitle("Sentiment"+str(data))
+        chartview = QChartView(chart)
+        chartview.setGeometry(0,0,600,500)
+        chartview.setRenderHint(QPainter.Antialiasing)
+
+        self.savepi = QPixmap(chartview.grab())
+        self.savepi.save("C:/Users/Lenovo/Desktop/New folder/Sentiment_api.png", "PNG")
+        self.bro4.setStyleSheet('border-image:url(C:/Users/Lenovo/Desktop/New folder/Sentiment_api.png);')
+
+#########################################################################################################################
+
+'''def check_search(self,data,slide,date1,date2): # Fucntion check search word
+        pan = pandas.read_csv('file_list_API.csv')
+        check = str(data)+'.csv'
+        store_file = []
+        for i in pan['file_name']:  #Check word search in file_list_API
+            store_file.append(i)
+        if check not in store_file:
+            obj = Twitter_API(data,slide,date1,date2)
+            obj.search()
+            print("This one :"+data)
+            self.obj1 = NLP(data,'api')
+            self.obj1.save_analysis(slide,data,'api')
+            self.read_file(data)
+            self.read_file_10rank(data)
+            self.create_piechart(data)
+            self.get_time(data)
+
+        else:
+            self.read_file(data)
+            self.read_file_10rank(data)
+            self.get_time(data)
+            self.create_piechart(data)
+            self.show_sentiment(data)'''
+
+###########################################################################################################################
+
+'''def check_search(self,data,slide): # Fucntion check search word
+        pan = pandas.read_csv('file_list_Crawler.csv')
+        check = str(data)+'.csv'
+        store_file = []
+        for i in pan['file_name']: #Check word search in file_list_Crawler
+            store_file.append(i)
+        if check not in store_file: 
+            crawler = Search_Crawler()
+            crawler.check_lan(data)
+            print("This one :"+ data)
+            self.obj1 = NLP(data,'crawler')
+            self.obj1.save_analysis(slide,data,'crawler')
+
+
+        else:
+            '''
