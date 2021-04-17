@@ -19,15 +19,12 @@ import shutil
 import codecs
 from itertools import chain
 from nltk import NaiveBayesClassifier as nbc
+from geopy.geocoders import Nominatim
+import plotly.express as px
 
 from API import *
 from NLP import *
 from Combine_GUI import*
-
-class TestNumber(unittest.TestCase): # Test Unit test
-    def test_main(self):
-        controller = Controller()
-        self.assertIsNotNone(controller)
 
 class Progress(QThread): # Class progress bar
     
@@ -50,6 +47,7 @@ class API_thread(QObject): # Class progress bar
     signal1 = pyqtSignal(str)
     signal2 = pyqtSignal(object)
     signal3 = pyqtSignal(str,int,int,int,int)
+    signal4 = pyqtSignal(str)
     finished = pyqtSignal()
     
     def __init__(self,data,slide,date1,date2):
@@ -151,25 +149,23 @@ class API_thread(QObject): # Class progress bar
     def geopy(self):
 
         geolocator = Nominatim(user_agent="sample app")
-        name = 'รัฐบาล'
-
         headers = ['Address', 'Lat', 'Lon']
-        file_name = str(name)+'_map.csv'
-        pan = pd.read_csv(str(name)+'_Data.csv')
+        file_name = str(self.data)+'_map.csv'
 
-        for i in pan['places']:
+        for i in self.df['places']:
             try:
-                data = geolocator.geocode(str(i))
-                data.raw.get("lat"), data.raw.get("lon")
-                data.point.latitude, data.point.longitude
+                if str(i) != 'nan':
+                    data = geolocator.geocode(str(i))
+                    data.raw.get("lat"), data.raw.get("lon")
+                    data.point.latitude, data.point.longitude
 
-                csvfile = open(file_name, 'r', newline='', encoding='utf-8')
-                csvfile = open(file_name, 'a', newline='', encoding='utf-8')
-                writer = csv.DictWriter(csvfile, fieldnames=headers)
-                article = (i, data.point.latitude, data.point.longitude)
-                writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
-                csvfile.close()
-                print("2")
+                    csvfile = open(file_name, 'r', newline='', encoding='utf-8')
+                    csvfile = open(file_name, 'a', newline='', encoding='utf-8')
+                    writer = csv.DictWriter(csvfile, fieldnames=headers)
+                    article = (i, data.point.latitude, data.point.longitude)
+                    writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
+                    csvfile.close()
+                    print("2")
 
             except FileNotFoundError:
                 csvfile = open(file_name, 'w', newline='', encoding='utf-8')
@@ -183,7 +179,31 @@ class API_thread(QObject): # Class progress bar
             except AttributeError:
                 print('3')
                 pass
-        #plotly()
+        
+        df = pd.read_csv(str(self.data)+'_map.csv')
+        fig = px.scatter_geo(df, 
+                            # longitude is taken from the df["lon"] columns and latitude from df["lat"]
+                            lon="Lon", 
+                            lat="Lat", 
+                            # choose the map chart's projection
+                            projection="natural earth",
+                            # columns which is in bold in the pop up
+                            hover_name = "Address",
+                            # format of the popup not to display these columns' data
+                            hover_data = {"Address":False,
+                                        "Lon": False,
+                                        "Lat": False})
+
+        # scatter_geo allow to change the map date based on the information from the df dataframe, but we can separately specify the values that are common to all
+        # change the size of the markers to 25 and color to red
+        fig.update_traces(marker=dict(size=25, color="red"))
+        # fit the map to surround the points
+        fig.update_geos(fitbounds="locations", showcountries = True)
+        # add title
+        fig.update_layout(title = 'Your customers')
+        fig.write_image(f"C:/Users/Lenovo/Desktop/New folder/{self.data}_map.png")
+        self.signal4.emit(self.data)
+
 
     def get_time(self): # Function Get time from dateEdit
 
@@ -209,8 +229,10 @@ class API_thread(QObject): # Class progress bar
         print(self.df)
         if re.match('[ก-๙]',self.data) != None:
             self.Sentiment_pickel()
+            self.geopy()
         else:
             self.Sentiment_en()
+            self.geopy()
 
         self.signal2.emit(self.df.sort_values(by="time"))
 
@@ -243,6 +265,7 @@ class tweety_search(QWidget):
         self.worker.signal1.connect(self.Link)
         self.worker.signal2.connect(self.Link2)
         self.worker.signal3.connect(self.Link3)
+        self.worker.signal4.connect(self.Link4)
         self.button.setEnabled(False)
         self.button1.setEnabled(False)
 
@@ -255,7 +278,6 @@ class tweety_search(QWidget):
         self.progress.start()
         self.button.setEnabled(False)
         self.button1.setEnabled(False)
-
 
     def Back(self): #Back to Main GUI
         self.switch_window.emit()
@@ -404,7 +426,6 @@ class tweety_search(QWidget):
         self.view.setModel(model)
     
     def Link3(self,data,pos,neg,neu,tol):
-        
         se = QPieSeries()
 
         se.append('Positive',int(pos))
@@ -435,6 +456,9 @@ class tweety_search(QWidget):
 
         self.button.setEnabled(True)
         self.button1.setEnabled(True)
+    
+    def Link4(self,name):
+        self.bro1.setStyleSheet(f'border-image:url(C:/Users/Lenovo/Desktop/New folder/{name}_map.png);')
 
     #time tweet of word
     def read_file(self,query):

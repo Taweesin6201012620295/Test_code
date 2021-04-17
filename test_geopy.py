@@ -5,11 +5,12 @@ import folium
 from folium.plugins import MarkerCluster
 import pandas as pd
 import plotly.express as px
+from datetime import datetime, date
 
 def geopy():
 
     geolocator = Nominatim(user_agent="sample app")
-    name = 'รัฐบาล'
+    name = 'ไททัน'
 
     headers = ['Address', 'Lat', 'Lon']
     file_name = str(name)+'_map.csv'
@@ -17,17 +18,18 @@ def geopy():
 
     for i in pan['places']:
         try:
-            data = geolocator.geocode(str(i))
-            data.raw.get("lat"), data.raw.get("lon")
-            data.point.latitude, data.point.longitude
+            if str(i) != 'nan':
+                data = geolocator.geocode(str(i))
+                data.raw.get("lat"), data.raw.get("lon")
+                data.point.latitude, data.point.longitude
 
-            csvfile = open(file_name, 'r', newline='', encoding='utf-8')
-            csvfile = open(file_name, 'a', newline='', encoding='utf-8')
-            writer = csv.DictWriter(csvfile, fieldnames=headers)
-            article = (i, data.point.latitude, data.point.longitude)
-            writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
-            csvfile.close()
-            print("2")
+                csvfile = open(file_name, 'r', newline='', encoding='utf-8')
+                csvfile = open(file_name, 'a', newline='', encoding='utf-8')
+                writer = csv.DictWriter(csvfile, fieldnames=headers)
+                article = (i, data.point.latitude, data.point.longitude)
+                writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
+                csvfile.close()
+                print("2")
 
         except FileNotFoundError:
             csvfile = open(file_name, 'w', newline='', encoding='utf-8')
@@ -44,7 +46,8 @@ def geopy():
     plotly()
 
 def plotly():
-    name = 'รัฐบาล'
+
+    name = 'ไททัน'
     df = pd.read_csv(str(name)+'_map.csv')
 
     fig = px.scatter_geo(df, 
@@ -71,4 +74,7 @@ def plotly():
     fig.show()
 
 if __name__ == "__main__":
+    start = datetime.now()
     geopy()
+    finish = datetime.now()
+    print(finish - start)
