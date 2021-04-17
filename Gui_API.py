@@ -101,7 +101,7 @@ class API_thread(QObject): # Class progress bar
         #print("Total Negative = ", self.neg)
         #print("Total Neutral = ", self.neu)
 
-        self.signal3.emit(self.data,pos,neg,neu)
+        self.signal3.emit(self.data,pos,neg,neu,tol)
 
     #Load Pickel
     def loadData(self):
@@ -148,6 +148,42 @@ class API_thread(QObject): # Class progress bar
 
         self.signal3.emit(self.data,pos,neg,neu,tol)
 
+    def geopy(self):
+
+        geolocator = Nominatim(user_agent="sample app")
+        name = 'รัฐบาล'
+
+        headers = ['Address', 'Lat', 'Lon']
+        file_name = str(name)+'_map.csv'
+        pan = pd.read_csv(str(name)+'_Data.csv')
+
+        for i in pan['places']:
+            try:
+                data = geolocator.geocode(str(i))
+                data.raw.get("lat"), data.raw.get("lon")
+                data.point.latitude, data.point.longitude
+
+                csvfile = open(file_name, 'r', newline='', encoding='utf-8')
+                csvfile = open(file_name, 'a', newline='', encoding='utf-8')
+                writer = csv.DictWriter(csvfile, fieldnames=headers)
+                article = (i, data.point.latitude, data.point.longitude)
+                writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
+                csvfile.close()
+                print("2")
+
+            except FileNotFoundError:
+                csvfile = open(file_name, 'w', newline='', encoding='utf-8')
+                writer = csv.DictWriter(csvfile, fieldnames=headers)
+                writer.writeheader()
+                article = (i, data.point.latitude, data.point.longitude)
+                writer.writerow( {'Address':article[0], 'Lat':article[1], 'Lon':article[2]} )
+                csvfile.close()
+                print("1")
+
+            except AttributeError:
+                print('3')
+                pass
+        #plotly()
 
     def get_time(self): # Function Get time from dateEdit
 
@@ -169,7 +205,7 @@ class API_thread(QObject): # Class progress bar
         colume1 = pan['time'] >= f'{year1}-{month1}-{day_1} 00:00:00'
         colume2 = pan['time'] <= f'{year2}-{month2}-{day_2} 23:59:59'
         between = pan[colume1 & colume2]
-        self.df = pd.DataFrame({'time': between['time'],'tweet': between['tweet']})
+        self.df = pd.DataFrame({'time': between['time'],'tweet': between['tweet'],'places': between['places']})
         print(self.df)
         if re.match('[ก-๙]',self.data) != None:
             self.Sentiment_pickel()
@@ -274,24 +310,24 @@ class tweety_search(QWidget):
         self.label_2.move(20,150)
         self.label_2.setFont(QtGui.QFont("Helvetica",16))
         #QLabel4
-        self.label_5 = QLabel('Results of the tweet you searched',self)
-        self.label_5.move(20,300)
-        self.label_5.setFont(QtGui.QFont("Helvetica",16))
+        self.label_3 = QLabel('Map',self)
+        self.label_3.move(650,470)
+        self.label_3.setFont(QtGui.QFont("Helvetica",16))
         #QLabel5
         self.label_5 = QLabel('Ranking Graph',self)
-        self.label_5.move(800,15)
+        self.label_5.move(650,15)
         self.label_5.setFont(QtGui.QFont("Helvetica",16))
         #QLabel6
         self.label_6 = QLabel('Sentiment',self)
-        self.label_6.move(800,470)
+        self.label_6.move(1300,15)
         self.label_6.setFont(QtGui.QFont("Helvetica",16))
         #QLabel6
         self.label_7 = QLabel('Since',self)
-        self.label_7.move(500,10)
+        self.label_7.move(450,10)
         self.label_7.setFont(QtGui.QFont("Helvetica",16))
         #QLabel6
         self.label_8 = QLabel('Until',self)
-        self.label_8.move(500,150)
+        self.label_8.move(450,150)
         self.label_8.setFont(QtGui.QFont("Helvetica",16))
 
         #ComboBox th and en
@@ -300,31 +336,31 @@ class tweety_search(QWidget):
         self.slide.addItem('en')
         self.slide.move(280,150)
         self.slide.setFont(QtGui.QFont("Helvetica",16))
-        
+
         #TextBrowser
-        #self.bro1 = QTextBrowser(self)
-        #self.bro1.resize(250,30)
-        #self.bro1.move(1320,800)
-        #self.bro1.setFont(QtGui.QFont("Helvetica",12))
+        self.bro1 = QTextBrowser(self)
+        self.bro1.resize(800,450)
+        self.bro1.move(720,460)
+        self.bro1.setFont(QtGui.QFont("Helvetica",12))
         #TextBrowser
         self.bro2 = QTextBrowser(self)
-        self.bro2.resize(250,300)
-        self.bro2.move(1300,50)
+        self.bro2.resize(200,280)
+        self.bro2.move(1100,50)
         self.bro2.setFont(QtGui.QFont("Helvetica",12))
         #TextBrowser
         self.bro3 = QTextBrowser(self)
-        self.bro3.resize(500,400)
-        self.bro3.move(800,50)
+        self.bro3.resize(450,400)
+        self.bro3.move(650,50)
         self.bro3.setFont(QtGui.QFont("Helvetica",12))
         #TextBrower
         self.bro5 = QTextBrowser(self)
-        self.bro5.resize(500,400)
-        self.bro5.move(800,500)
+        self.bro5.resize(450,400)
+        self.bro5.move(1300,50)
         self.bro5.setFont(QtGui.QFont("Helvetica",12))
         #TextBrower
         self.bro6 = QTextBrowser(self)
-        self.bro6.resize(250,300)
-        self.bro6.move(1300,500)
+        self.bro6.resize(230,150)
+        self.bro6.move(1520,450)
         self.bro6.setFont(QtGui.QFont("Helvetica",12))
 
         #DateEdit
@@ -338,7 +374,7 @@ class tweety_search(QWidget):
         self.dateEdit.setDate(QtCore.QDate(2021, 11, 2))
         self.dateEdit.setCalendarPopup(True)
         self.dateEdit.resize(150,50)
-        self.dateEdit.move(500,50)
+        self.dateEdit.move(450,50)
         self.dateEdit.setFont(QtGui.QFont("Helvetica",12))
         #DateEdit
         self.dateEdit1 = QDateEdit(self)
@@ -347,11 +383,11 @@ class tweety_search(QWidget):
         self.dateEdit1.setDate(QtCore.QDate(2021, 11, 2))
         self.dateEdit1.setCalendarPopup(True)
         self.dateEdit1.resize(150,50)
-        self.dateEdit1.move(500,200)
+        self.dateEdit1.move(450,200)
         self.dateEdit1.setFont(QtGui.QFont("Helvetica",12))
 
         self.view = QTableView(self)
-        self.view.resize(750,500)
+        self.view.resize(600,500)
         self.view.move(10,350)
 
     def signal_accept(self, msg): # Function Progress bar
