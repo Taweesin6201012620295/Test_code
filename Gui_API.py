@@ -40,6 +40,8 @@ class Progress(QThread): # Class progress bar
         for i in range(100):
             time.sleep(0.05)
             self._signal.emit(i)
+    '''def run(self):
+        self._signal.emit(i)'''
 
 
 class API_thread(QObject): # Class progress bar
@@ -58,6 +60,9 @@ class API_thread(QObject): # Class progress bar
         self.date2 = date2
     
     def check_search(self): # Fucntion check search word
+        old_data = self.data
+        old_date1 = self.date1
+        old_date2 = self.date2
         pan = pandas.read_csv('file_list_API.csv')
         check = str(self.data)+'.csv'
         store_file = []
@@ -67,17 +72,26 @@ class API_thread(QObject): # Class progress bar
             obj = Twitter_API(self.data,self.slide,self.date1,self.date2)
             obj.search()
             print("This one :"+self.data)
-
             self.obj1 = NLP(self.data,'api')
             self.obj1.save_analysis(self.slide,self.data,'api')
             self.signal1.emit(self.data)
             self.get_time()
 
-        else:
-            self.signal1.emit(self.data)
+        else :
             self.get_time()
 
         self.finished.emit()
+    
+    #update datetime
+    def update_time(self):
+        obj = Twitter_API(data,slide,date1,date2)
+        obj.search()
+        obj1 = NLP(data,'api')
+        obj1.save_analysis(slide,data,'api')
+        self.read_file(data)
+        self.read_file_10rank(data)
+        self.create_piechart(data)
+        self.get_time(data)
     
     #Sentiment English
     def Sentiment_en(self):
@@ -179,30 +193,32 @@ class API_thread(QObject): # Class progress bar
             except AttributeError:
                 print('3')
                 pass
-        
-        df = pd.read_csv(str(self.data)+'_map.csv')
-        fig = px.scatter_geo(df, 
-                            # longitude is taken from the df["lon"] columns and latitude from df["lat"]
-                            lon="Lon", 
-                            lat="Lat", 
-                            # choose the map chart's projection
-                            projection="natural earth",
-                            # columns which is in bold in the pop up
-                            hover_name = "Address",
-                            # format of the popup not to display these columns' data
-                            hover_data = {"Address":False,
-                                        "Lon": False,
-                                        "Lat": False})
+        try:
+            df = pd.read_csv(str(self.data)+'_map.csv')
+            fig = px.scatter_geo(df, 
+                                # longitude is taken from the df["lon"] columns and latitude from df["lat"]
+                                lon="Lon", 
+                                lat="Lat", 
+                                # choose the map chart's projection
+                                projection="natural earth",
+                                # columns which is in bold in the pop up
+                                hover_name = "Address",
+                                # format of the popup not to display these columns' data
+                                hover_data = {"Address":False,
+                                            "Lon": False,
+                                            "Lat": False})
 
-        # scatter_geo allow to change the map date based on the information from the df dataframe, but we can separately specify the values that are common to all
-        # change the size of the markers to 25 and color to red
-        fig.update_traces(marker=dict(size=25, color="red"))
-        # fit the map to surround the points
-        fig.update_geos(fitbounds="locations", showcountries = True)
-        # add title
-        fig.update_layout(title = 'Your customers')
-        fig.write_image(f"C:/Users/Lenovo/Desktop/New folder/{self.data}_map.png")
-        self.signal4.emit(self.data)
+            # scatter_geo allow to change the map date based on the information from the df dataframe, but we can separately specify the values that are common to all
+            # change the size of the markers to 25 and color to red
+            fig.update_traces(marker=dict(size=25, color="red"))
+            # fit the map to surround the points
+            fig.update_geos(fitbounds="locations", showcountries = True)
+            # add title
+            fig.update_layout(title = 'Your customers')
+            fig.write_image(f"C:/Users/Lenovo/Desktop/New folder/{self.data}_map.png")
+            self.signal4.emit(self.data)
+        except FileNotFoundError:
+            pass
 
 
     def get_time(self): # Function Get time from dateEdit
@@ -228,13 +244,15 @@ class API_thread(QObject): # Class progress bar
         self.df = pd.DataFrame({'time': between['time'],'tweet': between['tweet'],'places': between['places']})
         print(self.df)
         if re.match('[ก-๙]',self.data) != None:
+            self.signal1.emit(self.data)
             self.Sentiment_pickel()
+            self.signal2.emit(self.df.sort_values(by="time"))
             self.geopy()
         else:
+            self.signal1.emit(self.data)
             self.Sentiment_en()
+            self.signal2.emit(self.df.sort_values(by="time"))
             self.geopy()
-
-        self.signal2.emit(self.df.sort_values(by="time"))
 
 
 class tweety_search(QWidget):
@@ -306,11 +324,11 @@ class tweety_search(QWidget):
         self.button.clicked.connect(self.getTextValue)
         self.button.setFont(QtGui.QFont("Helvetica",14))
         #creating button QPushButton
-        self.button1 = QPushButton("Update Datetime",self)
+        '''self.button1 = QPushButton("Update Datetime",self)
         self.button1.resize(200,40)
         self.button1.move(10,250)
         self.button1.clicked.connect(self.update_time)
-        self.button1.setFont(QtGui.QFont("Helvetica",14))
+        self.button1.setFont(QtGui.QFont("Helvetica",14))'''
         #creating button QPushButton
         self.button3 = QPushButton("Back",self)
         self.button3.resize(150,80)
@@ -453,12 +471,12 @@ class tweety_search(QWidget):
             writer = csv.writer(f)
             writer.writerow(['pos','neg','neu'])
             writer.writerow([pos,neg,neu])
-
-        self.button.setEnabled(True)
-        self.button1.setEnabled(True)
     
     def Link4(self,name):
         self.bro1.setStyleSheet(f'border-image:url(C:/Users/Lenovo/Desktop/New folder/{name}_map.png);')
+        self.pbar.setValue(100)
+        self.button.setEnabled(True)
+        self.button1.setEnabled(True)
 
     #time tweet of word
     def read_file(self,query):
@@ -498,22 +516,6 @@ class tweety_search(QWidget):
         self.savepi = QPixmap(chartview.grab())
         self.savepi.save("C:/Users/Lenovo/Desktop/New folder/10_Rank_API.png", "PNG")
         self.bro3.setStyleSheet('border-image:url(C:/Users/Lenovo/Desktop/New folder/10_Rank_API.png);')
-
-
-    #update datetime
-    def update_time(self):
-        data = self.inputbox.text()
-        slide = self.slide.currentText()
-        date1 = self.dateEdit.date().toPyDate()
-        date2 = self.dateEdit1.date().toPyDate()
-        obj = Twitter_API(data,slide,date1,date2)
-        obj.search()
-        obj1 = NLP(data,'api')
-        obj1.save_analysis(slide,data,'api')
-        self.read_file(data)
-        self.read_file_10rank(data)
-        self.create_piechart(data)
-        self.get_time(data)
 
 
     #Show and Exit

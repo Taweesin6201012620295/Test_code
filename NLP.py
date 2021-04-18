@@ -10,7 +10,6 @@ import spacy
 from nltk.corpus import stopwords
 import csv
 from spacy.lang.en.stop_words import STOP_WORDS
-from spacy.matcher import *
 from pythainlp import *
 from pythainlp.corpus import*
 import pandas
