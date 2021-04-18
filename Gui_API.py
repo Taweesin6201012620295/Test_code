@@ -40,9 +40,6 @@ class Progress(QThread): # Class progress bar
         for i in range(100):
             time.sleep(0.05)
             self._signal.emit(i)
-    '''def run(self):
-        self._signal.emit(i)'''
-
 
 class API_thread(QObject): # Class progress bar
     
@@ -60,9 +57,7 @@ class API_thread(QObject): # Class progress bar
         self.date2 = date2
     
     def check_search(self): # Fucntion check search word
-        old_data = self.data
-        old_date1 = self.date1
-        old_date2 = self.date2
+
         pan = pandas.read_csv('file_list_API.csv')
         check = str(self.data)+'.csv'
         store_file = []
@@ -82,17 +77,6 @@ class API_thread(QObject): # Class progress bar
 
         self.finished.emit()
     
-    #update datetime
-    def update_time(self):
-        obj = Twitter_API(data,slide,date1,date2)
-        obj.search()
-        obj1 = NLP(data,'api')
-        obj1.save_analysis(slide,data,'api')
-        self.read_file(data)
-        self.read_file_10rank(data)
-        self.create_piechart(data)
-        self.get_time(data)
-    
     #Sentiment English
     def Sentiment_en(self):
         #Part-2: Sentiment Analysis Report
@@ -109,9 +93,6 @@ class API_thread(QObject): # Class progress bar
             else:
                 neu = neu + 1
         tol = pos + neg + neu
-        #print("Total Positive = ", self.pos)
-        #print("Total Negative = ", self.neg)
-        #print("Total Neutral = ", self.neu)
 
         self.signal3.emit(self.data,pos,neg,neu,tol)
 
@@ -153,10 +134,6 @@ class API_thread(QObject): # Class progress bar
                 neu = neu+1
 
         tol = pos + neg + neu
-
-        print("Total Positive = ", pos)
-        print("Total Negative = ", neg)
-        print("Total Neutral = ", neu)
 
         self.signal3.emit(self.data,pos,neg,neu,tol)
 
@@ -266,6 +243,7 @@ class tweety_search(QWidget):
 
     #copy text from line edit
     def getTextValue(self):
+        self.pbar.setValue(10)
         data = self.inputbox.text()
         slide = self.slide.currentText()
         date1 = self.dateEdit.date().toPyDate()
@@ -288,10 +266,10 @@ class tweety_search(QWidget):
 
         self.thread.start()
         self.button.setEnabled(True)
-        self.progress._signal.connect(self.signal_accept)
+        '''self.progress._signal.connect(self.signal_accept)
         self.progress._signal.connect(self.progress.quit)
+        self.progress.start()'''
 
-        self.progress.start()
         self.button.setEnabled(False)
 
     def Back(self): #Back to Main GUI
@@ -320,8 +298,8 @@ class tweety_search(QWidget):
         self.button.move(320,100)
         self.button.clicked.connect(self.getTextValue)
         self.button.setFont(QtGui.QFont("Helvetica",14))
-        #creating button QPushButton
-        '''self.button1 = QPushButton("Update Datetime",self)
+        '''#creating button QPushButton
+        self.button1 = QPushButton("Update Datetime",self)
         self.button1.resize(200,40)
         self.button1.move(10,250)
         self.button1.clicked.connect(self.update_time)
@@ -427,19 +405,29 @@ class tweety_search(QWidget):
         self.view.resize(600,500)
         self.view.move(10,350)
 
-    def signal_accept(self, msg): # Function Progress bar
+    '''def signal_accept(self, msg): # Function Progress bar
         self.pbar.setValue(int(msg))
         if self.pbar.value() == 99:
-            self.pbar.setValue(0)
+            self.pbar.setValue(0)'''
+    
+    '''def signal_accept(self, msg): # Function Progress bar
+        self.now += int(msg)
+        bar = self.now / self.total*100
+        self.pbar.setValue(bar)
+
+        if self.pbar.value() == 99:
+            self.pbar.setValue(0)'''
 
     def Link(self,data):
         self.read_file_10rank(data)
         self.create_piechart(data)
+        self.pbar.setValue(20)
 
     def Link2(self,df):
         model = pandasModel(df)
         self.view.setModel(model)
-    
+        self.pbar.setValue(80)
+
     def Link3(self,data,pos,neg,neu,tol):
         se = QPieSeries()
 
@@ -468,19 +456,13 @@ class tweety_search(QWidget):
             writer = csv.writer(f)
             writer.writerow(['pos','neg','neu'])
             writer.writerow([pos,neg,neu])
-    
+
     def Link4(self,name):
         self.bro1.setStyleSheet(f'border-image:url(C:/Users/Lenovo/Desktop/New folder/{name}_map.png);')
         self.pbar.setValue(100)
+        time.sleep(1)
+        self.pbar.setValue(0)
         self.button.setEnabled(True)
-
-    #time tweet of word
-    def read_file(self,query):
-        pan = pd.read_csv(str(query)+'_Data.csv')
-        df = pd.DataFrame({'time': pan['time'],'tweet': pan['tweet']})
-        model = pandasModel(df)
-        self.view.setModel(model)
-
 
     #10 Ranking word
     def read_file_10rank(self,query):
@@ -513,6 +495,14 @@ class tweety_search(QWidget):
         self.savepi.save("C:/Users/Lenovo/Desktop/New folder/10_Rank_API.png", "PNG")
         self.bro3.setStyleSheet('border-image:url(C:/Users/Lenovo/Desktop/New folder/10_Rank_API.png);')
 
+    '''#update datetime
+    def update_time(self):
+        obj = Twitter_API(self.data,self.slide,self.date1,self.date2)
+        obj.search()
+        obj1 = NLP(self.data,'api')
+        obj1.save_analysis(self.slide,self.data,'api')
+        self.signal1.emit(self.data)
+        self.get_time()'''
 
     #Show and Exit
     def show_exit(self):

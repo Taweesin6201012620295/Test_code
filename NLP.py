@@ -189,8 +189,8 @@ if __name__ == "__main__":
     
     class Unit_test(unittest.TestCase):
         def test_NLP(self):
-            obj = NLP('God','crawler')
-            obj.save_analysis('en','God','crawler')
+            obj = NLP('covid','crawler')
+            obj.save_analysis('en','covid','crawler')
             self.assertIsNotNone(obj)
 
     #start = time.time()

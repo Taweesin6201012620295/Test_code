@@ -10,7 +10,7 @@ from datetime import datetime, date
 def geopy():
 
     geolocator = Nominatim(user_agent="sample app")
-    name = 'ไททัน'
+    name = 'โควิด19'
 
     headers = ['Address', 'Lat', 'Lon']
     file_name = str(name)+'_map.csv'
@@ -43,11 +43,10 @@ def geopy():
         except AttributeError:
             print('3')
             pass
-    plotly()
 
 def plotly():
 
-    name = 'ไททัน'
+    name = 'โควิด19'
     df = pd.read_csv(str(name)+'_map.csv')
 
     fig = px.scatter_geo(df, 
@@ -75,6 +74,7 @@ def plotly():
 
 if __name__ == "__main__":
     start = datetime.now()
-    geopy()
+    #geopy()
+    plotly()
     finish = datetime.now()
     print(finish - start)

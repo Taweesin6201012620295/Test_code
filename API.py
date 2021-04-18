@@ -103,11 +103,11 @@ class Twitter_API:
 
 if __name__ == "__main__":
 
-    #class Unit_test(unittest.TestCase):
-    #    def test_API(self):
+    class Unit_test(unittest.TestCase):
+        def test_API(self):
             obj = Twitter_API("โควิด","th","2021-04-14","2021-04-18");
-            obj.search()
-    #        self.assertIsNotNone(obj.search())
-    #        self.assertTrue(obj.write_csv())
+            #obj.search()
+            self.assertIsNotNone(obj.search())
+            self.assertTrue(obj.write_csv())
 
-    #unittest.main()
+    unittest.main()
