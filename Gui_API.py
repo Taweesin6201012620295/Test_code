@@ -285,17 +285,14 @@ class tweety_search(QWidget):
         self.worker.signal3.connect(self.Link3)
         self.worker.signal4.connect(self.Link4)
         self.button.setEnabled(False)
-        self.button1.setEnabled(False)
 
         self.thread.start()
         self.button.setEnabled(True)
-        self.button1.setEnabled(True)
         self.progress._signal.connect(self.signal_accept)
         self.progress._signal.connect(self.progress.quit)
 
         self.progress.start()
         self.button.setEnabled(False)
-        self.button1.setEnabled(False)
 
     def Back(self): #Back to Main GUI
         self.switch_window.emit()
@@ -476,7 +473,6 @@ class tweety_search(QWidget):
         self.bro1.setStyleSheet(f'border-image:url(C:/Users/Lenovo/Desktop/New folder/{name}_map.png);')
         self.pbar.setValue(100)
         self.button.setEnabled(True)
-        self.button1.setEnabled(True)
 
     #time tweet of word
     def read_file(self,query):
