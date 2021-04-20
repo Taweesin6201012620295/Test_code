@@ -1,8 +1,6 @@
 import io
 import csv
 from geopy.geocoders import Nominatim
-import folium
-from folium.plugins import MarkerCluster
 import pandas as pd
 import plotly.express as px
 from datetime import datetime, date
